@@ -2392,6 +2392,16 @@ end
 
 -- File system actions --------------------------------------------------------
 H.fs_actions_confirm = function(fs_actions)
+  if vim.g.mini_files_auto_confirm_on_simple_edits and vim.tbl_isempty(fs_actions.delete) then
+    local count = 0
+    for action, paths in pairs(fs_actions) do
+      if not vim.tbl_isempty(paths) then count = count + 1 end
+    end
+
+    -- Only one action is present so just automatically confirm it
+    if count == 1 then return true end
+  end
+
   local msg = table.concat(H.fs_actions_to_lines(fs_actions), '\n')
   local confirm_res = vim.fn.confirm(msg, '&Yes\n&No', 1, 'Question')
   return confirm_res == 1
